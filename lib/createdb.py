@@ -3,6 +3,7 @@
 import subprocess
 import gzip
 import os
+from datetime import datetime, timedelta
 
 
 """
@@ -81,10 +82,13 @@ def create_db():
 
 def check_db():
 
-    # update database if import date is older than 1 day
+    # if date file is older than 1 day then update database
     if os.path.isfile(DATABASE_FILE):
-        pass
-    # import database
+        timefile = datetime.fromtimestamp(os.path.getmtime(DATABASE_FILE))
+        yesterday = datetime.today() - timedelta(days=1)
+        if timefile < yesterday:
+	    create_db()
+    # import database because does not exist
     else:
         create_db()
 
@@ -93,7 +97,7 @@ def check_db():
 #
 
 if __name__ == '__main__':
-    create_db('.')
+    create_db()
 
 
     
