@@ -106,25 +106,25 @@ class ConsoleMenu(GenericMenu):
     MOVE_UP_FIVE_LINES = '\33[5A'
     CLEAR_ENTIRE_LINE = '\33[K'
     
-    def __init__(self, title='', options=[]):
-        GenericMenu.__init__(self, title, options)
-        print ConsoleMenu.NEW_LINE
-        print ConsoleMenu.NEW_LINE
-        print ConsoleMenu.NEW_LINE
-        print ConsoleMenu.NEW_LINE
+    def __init__(self, *args, **kwargs):
+        GenericMenu.__init__(self, *args, **kwargs)
+        print self.NEW_LINE
+        print self.NEW_LINE
+        print self.NEW_LINE
+        print self.NEW_LINE
  
     def display(self):
-        print ConsoleMenu.MOVE_UP_FIVE_LINES
-        print ConsoleMenu.CLEAR_ENTIRE_LINE + self.title
+        print self.MOVE_UP_FIVE_LINES
+        print self.CLEAR_ENTIRE_LINE + self.title
      
         for index, value in enumerate(self.display_options):            
             if index == self.display_selected:
-                print ConsoleMenu.CLEAR_ENTIRE_LINE + '*' + value + '*'
+                print self.CLEAR_ENTIRE_LINE + '*' + value + '*'
             else:
-                print ConsoleMenu.CLEAR_ENTIRE_LINE + value
+                print self.CLEAR_ENTIRE_LINE + value
 
         for index in range(len(self.display_options), 3):
-            print ConsoleMenu.CLEAR_ENTIRE_LINE
+            print self.CLEAR_ENTIRE_LINE
 
 
 
@@ -135,11 +135,10 @@ class ConsoleMenu(GenericMenu):
 
 class OledMenu(GenericMenu):
     
-    def __init__(self):
-        GenericMenu.__init__(self)
+    def __init__(self, *args, **kwargs):
+        GenericMenu.__init__(self, *args, **kwargs)
 
-    def display(self, title='', options=[]):
-        GenericMenu.__init__(self, title, options)
+    def display(self, *args, **kwargs):
         pass
 
 

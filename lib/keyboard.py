@@ -1,71 +1,66 @@
+import i18n
 
 #
 # generic screen keyboard
 #
 
+
 class GenericKeyboard(object):
+
+    END = '<END>'
+    CANCEL = '<CANCEL>'
 
     #
     # constructor
     #
-    
-    def __init__(self, title='', text='', language='es'):
+
+    def __init__(self, title, text=''):
         """
         param:title: 'search'
         param:language: 'es'
         """
         object.__init__(self)
         self.text = text
-        self.title = title 
-        self.language = language
-        self.__selected = [0, 0]
+        self.title = title
+        self.x = 0
+        self.y = 0
 
     #
     # public
     #
 
-    END = '<END>'
-    CANCEL = '<CANCEL>'
-
     def enter(self):
-	"""
-	return: '<end>', '<cancel>' or key pressed
-	"""
+        """return <end>, <cancel> or key pressed"""
         return '<end>'
 
-    @property
+    def selected(self):
+        return i18n.KEYBOARD1[self.y][self.x]
+
     def up(self):
-        pass
+        if self.y > 0:
+            self.y = self.y - 1
+        else:
+            self.y = 2
 
-    @up.setter
-    def up(self, value):
-        pass
-
-    @property
     def down(self):
-        pass
+        if self.y < 1:
+            self.y = self.y + 1
+        else:
+            self.y = 0
 
-    @up.setter
-    def down(self, value):
-        pass
-
-    @property
     def left(self):
-        pass
+        if self.x > 0:
+            self.x = self.x - 1
+        else:
+            self.x = 9
 
-    @up.setter
-    def left(self, value):
-        pass
-
-    @property
     def right(self):
-        pass
+        if self.x < 9:
+            self.x = self.x + 1
+        else:
+            self.x = 0
 
-    @up.setter
-    def right(self, value):
-        pass
-
-
+    #
     # to override
     #
 
@@ -93,15 +88,39 @@ class ConsoleKeyboard(GenericKeyboard):
     RIGHT = '\33D'
     RED = '\033[31m'
     DEFCOLOR = '\033[0m'
+    MOVE_UP_FIVE_LINES = '\33[5A'
+    CLEAR_ENTIRE_LINE = '\33[K'
 
-    def __init__(self, title='', text='', language='es'):
-        GenericKeyboard.__init__(self, title, text, language)
+    def __init__(self, *args, **kwargs):
+        GenericKeyboard.__init__(self, *args, **kwargs)
+        self.display()
 
     def display(self):
-        print ConsoleKeyboard.RED + 'hola' + ConsoleKeyboard.DEFCOLOR + 'adios'
+        key = self.selected()
+        shine = self.RED + key + self.DEFCOLOR
+        print self.MOVE_UP_FIVE_LINES
+        print self.CLEAR_ENTIRE_LINE + self.title + ':' + self.text
+        print self.CLEAR_ENTIRE_LINE + ' '.join(i18n.KEYBOARD1[0]).replace(key, shine)
+        print self.CLEAR_ENTIRE_LINE + ' '.join(i18n.KEYBOARD1[1]).replace(key, shine)
+        print self.CLEAR_ENTIRE_LINE + ' '.join(i18n.KEYBOARD1[2]).replace(key, shine)
 
 
-
-c = ConsoleKeyboard()
+c = ConsoleKeyboard('title', 'my text')
+c.display()
+c.right()
+c.display()
+c.right()
+c.display()
+c.right()
+c.display()
+c.left()
+c.display()
+c.left()
+c.display()
+c.left()
+c.display()
+c.left()
+c.display()
+c.down()
 c.display()
 

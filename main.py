@@ -3,7 +3,8 @@ from lib.keypad import Keyboard
 from lib.menu import ConsoleMenu
 from lib.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, get_stations_by_language
 from lib.createdb import check_db
-import i18n.es as literals
+import i18n
+
 
 class Options(object):
     
@@ -24,38 +25,51 @@ class Options(object):
     def final(self, title):
         pass
 
+    def get_stations_menu(self, stations, options):
+        result = []
+        for station in stations:
+            if station[2] != 0:
+                result.append({'title': station[0] + '|' + str(station[2]) + 'kbps', 'options': options})
+            else:
+                result.append({'title': station[0], 'options': options})
+        return result
+
+    def get_list_menu(self, items, options):
+        result = [{'title': item[0] + ' (' + str(item[1]) + ')', 'options': options} for item in items]
+        return result
+
     def stations_by_tag(self, title):
         tag = title[:title.rfind(" (")]
-        stationlist = get_stations_by_tag(tag)
-        options = [{'title':station[0] + '|' +  str(station[2]) + 'kbps', 'options':self.final} for station in stationlist]
-        self.stack.append({'title':tag, 'options':options})
+        stations = get_stations_by_tag(tag)
+        menu = self.get_stations_menu(stations, self.final)
+        self.stack.append({'title': tag, 'options': menu})
         
     def tags(self, title):
-        taglist = get_tags()
-        options = [{'title':tag[0] + ' ('+str(tag[1])+')', 'options':self.stations_by_tag} for tag in taglist]
-        self.stack.append({'title':title, 'options':options})
+        tags = get_tags()
+        menu = self.get_list_menu(tags, self.stations_by_tag)
+        self.stack.append({'title': title, 'options': menu})
 
     def stations_by_country(self, title):
         country = title[:title.rfind(" (")]
-        stationlist = get_stations_by_country(country)
-        options = [{'title':station[0] + '|' +  str(station[2]) + 'kbps', 'options':self.final} for station in stationlist]
-        self.stack.append({'title':country, 'options':options})
+        stations = get_stations_by_country(country)
+        menu = self.get_stations_menu(stations, self.final)
+        self.stack.append({'title': country, 'options': menu})
 
     def countries(self, title):
-        countrieslist = get_countries()
-        options = [{'title':country[0] + ' ('+str(country[1])+')', 'options':self.stations_by_country} for country in countrieslist]
-        self.stack.append({'title':title, 'options':options})
+        tags = get_countries()
+        menu = self.get_list_menu(tags, self.stations_by_country)
+        self.stack.append({'title': title, 'options': menu})
 
     def stations_by_language(self, title):
         language = title[:title.rfind(" (")]
-        stationlist = get_stations_by_language(language)
-        options = [{'title':station[0] + '|' +  str(station[2]) + 'kbps', 'options':self.final} for station in stationlist]
-        self.stack.append({'title':language, 'options':options})
+        stations = get_stations_by_language(language)
+        menu = self.get_stations_menu(stations, self.final)
+        self.stack.append({'title': language, 'options': menu})
 
     def languages(self, title):
-        languageslist = get_languages()
-        options = [{'title':language[0] + ' ('+str(language[1])+')', 'options':self.stations_by_language} for language in languageslist]
-        self.stack.append({'title':title, 'options':options})
+        tags = get_languages()
+        menu = self.get_list_menu(tags, self.stations_by_language)
+        self.stack.append({'title': title, 'options': menu})
 
     #
     # constructor
@@ -65,19 +79,19 @@ class Options(object):
 
         empty = []
         radio = [
-            {'title':literals.FAVORITES, 'options':empty},
-            {'title':literals.RECENT   , 'options':empty},
-            {'title':literals.TAGS     , 'options':self.tags},
-            {'title':literals.COUNTRIES, 'options':self.countries},
-            {'title':literals.LANGUAGES, 'options':self.languages}
+            {'title': i18n.FAVORITES, 'options': empty},
+            {'title': i18n.RECENT,    'options': empty},
+            {'title': i18n.TAGS,      'options': self.tags},
+            {'title': i18n.COUNTRIES, 'options': self.countries},
+            {'title': i18n.LANGUAGES, 'options': self.languages}
             ]
         main = [
-            {'title':literals.RADIO    , 'options':radio},
-            {'title':literals.FM       , 'options':empty},
-            {'title':literals.BLUETOOTH, 'options':empty},
-            {'title':literals.OPTIONS  , 'options':empty}
+            {'title': i18n.RADIO,     'options': radio},
+            {'title': i18n.FM,        'options': empty},
+            {'title': i18n.BLUETOOTH, 'options': empty},
+            {'title': i18n.OPTIONS,   'options': empty}
             ]
-        menu = {'title':literals.MENU, 'options':main}
+        menu = {'title': i18n.MENU, 'options': main}
         
         self.stack = []
         self.stack.append(menu)
@@ -180,5 +194,3 @@ class App(object):
 check_db()
 app = App(ConsoleMenu(), Keyboard())
 app.start()
-  
-            

@@ -46,8 +46,8 @@ class Keyboard(GenericKeypad):
     # constructor
     #
     
-    def __init__(self):
-        GenericKeypad.__init__(self)
+    def __init__(self, *args, **kwargs):
+        GenericKeypad.__init__(self, *args, **kwargs)
 
     #
     # public
@@ -88,15 +88,12 @@ class GPIOKeyboard(GenericKeypad):
     # constructor
     #
     
-    def __init__(self):
-        GenericKeypad.__init__(self)
+    def __init__(self, *args, **kwargs):
+        GenericKeypad.__init__(self, *args, **kwargs)
 
     #
     # public
     #
 
     def get_key(self):
-	pass
-
-
-
+        pass
