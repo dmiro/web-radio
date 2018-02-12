@@ -14,6 +14,7 @@ TAGS = 'tags'
 COUNTRIES = 'countries'
 LANGUAGES = 'languages'
 EMPTY = 'empty'
+SEARCH = 'search'
 
 KEYBOARD1 = [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
              ['R', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],

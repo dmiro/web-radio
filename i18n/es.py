@@ -13,6 +13,7 @@ TAGS = 'etiquetas'
 COUNTRIES = 'paises'
 LANGUAGES = 'idiomas'
 EMPTY = 'vacio'
+SEARCH = 'buscar'
 
 KEYBOARD1 = [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
              ['R', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],

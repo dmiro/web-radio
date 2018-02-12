@@ -1,196 +1,99 @@
-from os.path import isfile
-from lib.keypad import Keyboard 
-from lib.menu import ConsoleMenu
+# MAIN
+
 from lib.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, get_stations_by_language
 from lib.createdb import check_db
+from lib.options import OptionsTree
 import i18n
 
+from lib.keypad import FisicKeyboard
+from lib.menu import ConsoleMenu
+from lib.keyboard import ConsoleKeyboard
+from lib.application import Application
 
-class Options(object):
-    
-    #
-    # private
-    #
-     
-    @property
-    def atop(self):
-        index = len(self.stack) - 1
-        return self.stack[index]
 
-    @atop.setter
-    def atop(self, value):
-        index = len(self.stack) - 1
-        self.stack[index] = value
-
-    def final(self, title):
-        pass
+class Options(OptionsTree):
 
     def get_stations_menu(self, stations, options):
         result = []
         for station in stations:
             if station[2] != 0:
-                result.append({'title': station[0] + '|' + str(station[2]) + 'kbps', 'options': options})
+                result.append(self.get_menu_option(station[0] + '|' + str(station[2]) + 'kbps', options))
             else:
-                result.append({'title': station[0], 'options': options})
+                result.append(self.get_menu_option(station[0], options))
         return result
 
     def get_list_menu(self, items, options):
-        result = [{'title': item[0] + ' (' + str(item[1]) + ')', 'options': options} for item in items]
+        result = [self.get_menu_option(item[0] + ' (' + str(item[1]) + ')', options) for item in items]
         return result
 
     def stations_by_tag(self, title):
         tag = title[:title.rfind(" (")]
         stations = get_stations_by_tag(tag)
         menu = self.get_stations_menu(stations, self.final)
-        self.stack.append({'title': tag, 'options': menu})
-        
+        self.append_option(self.get_menu_option(tag, menu))
+
     def tags(self, title):
         tags = get_tags()
         menu = self.get_list_menu(tags, self.stations_by_tag)
-        self.stack.append({'title': title, 'options': menu})
+        self.append_option(self.get_menu_option(title, menu))
 
     def stations_by_country(self, title):
         country = title[:title.rfind(" (")]
         stations = get_stations_by_country(country)
         menu = self.get_stations_menu(stations, self.final)
-        self.stack.append({'title': country, 'options': menu})
+        self.append_option(self.get_menu_option(country, menu))
 
     def countries(self, title):
         tags = get_countries()
         menu = self.get_list_menu(tags, self.stations_by_country)
-        self.stack.append({'title': title, 'options': menu})
+        self.append_option(self.get_menu_option(title, menu))
 
     def stations_by_language(self, title):
         language = title[:title.rfind(" (")]
         stations = get_stations_by_language(language)
         menu = self.get_stations_menu(stations, self.final)
-        self.stack.append({'title': language, 'options': menu})
+        self.append_option(self.get_menu_option(language, menu))
 
     def languages(self, title):
         tags = get_languages()
         menu = self.get_list_menu(tags, self.stations_by_language)
-        self.stack.append({'title': title, 'options': menu})
+        self.append_option(self.get_menu_option(title, menu))
+
+    def search(self, title):
+        m = self.get_keyboard_option(title, self.final)
+        self.append_option(m)
 
     #
     # constructor
     #
     
     def __init__(self):
-
+        OptionsTree.__init__(self)
         empty = []
         radio = [
-            {'title': i18n.FAVORITES, 'options': empty},
-            {'title': i18n.RECENT,    'options': empty},
-            {'title': i18n.TAGS,      'options': self.tags},
-            {'title': i18n.COUNTRIES, 'options': self.countries},
-            {'title': i18n.LANGUAGES, 'options': self.languages}
+            self.get_menu_option(i18n.FAVORITES, empty),
+            self.get_menu_option(i18n.RECENT, empty),
+            self.get_menu_option(i18n.SEARCH, self.search),
+            self.get_menu_option(i18n.TAGS, self.tags),
+            self.get_menu_option(i18n.COUNTRIES, self.countries),
+            self.get_menu_option(i18n.LANGUAGES, self.languages)
             ]
         main = [
-            {'title': i18n.RADIO,     'options': radio},
-            {'title': i18n.FM,        'options': empty},
-            {'title': i18n.BLUETOOTH, 'options': empty},
-            {'title': i18n.OPTIONS,   'options': empty}
+            self.get_menu_option(i18n.RADIO, radio),
+            self.get_menu_option(i18n.FM, empty),
+            self.get_menu_option(i18n.BLUETOOTH, empty),
+            self.get_menu_option(i18n.OPTIONS, empty)
             ]
-        menu = {'title': i18n.MENU, 'options': main}
-        
-        self.stack = []
-        self.stack.append(menu)
+        menu = self.get_menu_option(i18n.MENU, main)
+        self.set_menu(menu)
 
-    #
-    # public
-    #
-    
-    def menu_title(self):
-        return self.atop['title']
-    
-    def menu_options(self):
-        return [op['title'] for op in self.atop['options']]
-
-    def menu_selected(self):
-        if 'selected' in self.atop:
-            return self.atop['selected']
-        else:
-            return 0
-
-    def back(self):
-        if len(self.stack) > 1:
-            self.stack.pop()
-
-    def forward(self, index):
-        if self.atop['options']:
-            self.atop['selected'] = index
-            selected = self.atop['options'][index]
-            if callable(selected['options']):
-                selected['options'](selected['title'])
-            else:
-                self.stack.append(selected)
-        
-
-class App(object):
-    
-    #
-    # constructor
-    #
-    
-    def __init__(self, menudisplay, keypad):
-        object.__init__(self)
-        self.menudisplay = menudisplay
-        self.keypad = keypad
-        self.options = Options()
-
-    #
-    # private
-    #
-    def display(self):
-        self.menudisplay.title = self.options.menu_title()
-        self.menudisplay.options = self.options.menu_options()
-        self.menudisplay.selected = self.options.menu_selected()
-        self.menudisplay.display()
-
-    #
-    # public
-    #
-
-    def start(self):
-
-        self.display()
-        
-        key = self.keypad.UNKNOWN
-        
-        while key != self.keypad.QUIT:
-            
-            key = self.keypad.get_key()
-
-            # up
-            if key == self.keypad.UP:
-                self.menudisplay.selected = self.menudisplay.selected - 1
-                self.menudisplay.display()
-
-            # down
-            if key == self.keypad.DOWN:
-                self.menudisplay.selected = self.menudisplay.selected + 1
-                self.menudisplay.display()
-
-            # left
-            if key == self.keypad.LEFT:
-                self.options.back()
-                self.display()
-
-            # right
-            if key == self.keypad.RIGHT:
-                self.options.forward(self.menudisplay.selected)
-                self.display()
-
-            # enter
-            if key == self.keypad.ENTER:
-                pass        
-                #print menu.item_selected
-
-    
 #
 # main
 #
 
 check_db()
-app = App(ConsoleMenu(), Keyboard())
+app = Application(ConsoleMenu(),
+                  ConsoleKeyboard(),
+                  FisicKeyboard(),
+                  Options())
 app.start()

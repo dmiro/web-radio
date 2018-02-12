@@ -14,7 +14,7 @@ class GenericKeyboard(object):
     # constructor
     #
 
-    def __init__(self, title, text=''):
+    def __init__(self, title='', text=''):
         """
         param:title: 'search'
         param:language: 'es'
@@ -105,22 +105,16 @@ class ConsoleKeyboard(GenericKeyboard):
         print self.CLEAR_ENTIRE_LINE + ' '.join(i18n.KEYBOARD1[2]).replace(key, shine)
 
 
-c = ConsoleKeyboard('title', 'my text')
-c.display()
-c.right()
-c.display()
-c.right()
-c.display()
-c.right()
-c.display()
-c.left()
-c.display()
-c.left()
-c.display()
-c.left()
-c.display()
-c.left()
-c.display()
-c.down()
-c.display()
+#
+# main
+#
+
+if __name__ == '__main__':
+    c = ConsoleKeyboard('title', 'my text')
+    c.display()
+    c.right()
+    c.display()
+    c.right()
+    c.display()
+
 

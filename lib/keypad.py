@@ -37,10 +37,10 @@ class GenericKeypad(object):
 
 
 #
-# keyboard
+# Fisic keyboard
 #
 
-class Keyboard(GenericKeypad):
+class FisicKeyboard(GenericKeypad):
 
     #
     # constructor
@@ -63,19 +63,19 @@ class Keyboard(GenericKeypad):
             if ord(m) == 91:
                 key = ord(getch())
                 if key == 65: # up
-                   return Keyboard.UP 
+                   return self.UP
                 if key == 66: # down
-                   return Keyboard.DOWN 
+                   return self.DOWN
                 if key == 68: # left
-                    return Keyboard.LEFT
+                    return self.LEFT
                 if key == 67: # right
-                    return Keyboard.RIGHT
+                    return self.RIGHT
         # enter
         if ord(m) == 12:
-            return Keyboard.ENTER
+            return self.ENTER
         # quit
         if m == 'q':
-            return Keyboard.QUIT
+            return self.QUIT
 
 
 #
