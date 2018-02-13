@@ -71,7 +71,7 @@ class FisicKeyboard(GenericKeypad):
                 if key == 67: # right
                     return self.RIGHT
         # enter
-        if ord(m) == 12:
+        if ord(m) == 13:
             return self.ENTER
         # quit
         if m == 'q':
@@ -97,3 +97,11 @@ class GPIOKeyboard(GenericKeypad):
 
     def get_key(self):
         pass
+
+
+# test
+if __name__ == '__main__':
+
+    from getch import getch
+    m = getch()
+    print ord(m)

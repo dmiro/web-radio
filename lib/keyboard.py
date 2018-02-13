@@ -7,18 +7,15 @@ import i18n
 
 class GenericKeyboard(object):
 
-    END = '<END>'
-    CANCEL = '<CANCEL>'
+    END_MSG = '<END>'
+    CANCEL_MSG = '<CANCEL>'
+    KEYPRESS_MSG = '<KEY>'
 
     #
     # constructor
     #
 
     def __init__(self, title='', text=''):
-        """
-        param:title: 'search'
-        param:language: 'es'
-        """
         object.__init__(self)
         self.text = text
         self.title = title
@@ -30,8 +27,21 @@ class GenericKeyboard(object):
     #
 
     def enter(self):
-        """return <end>, <cancel> or key pressed"""
-        return '<end>'
+        """return <end>, <cancel> or <key>"""
+
+        ENTER_KEY = '*'
+        CANCEL_KEY = 'R'
+        DEL_KEY = '<'
+
+        if self.selected() == ENTER_KEY:
+            return self.END_MSG
+        if self.selected() == CANCEL_KEY:
+            return self.CANCEL_MSG
+        if self.selected() == DEL_KEY:
+            self.text = self.text[:-1]
+        else:
+            self.text = self.text + self.selected()
+        return self.KEYPRESS_MSG
 
     def selected(self):
         return i18n.KEYBOARD1[self.y][self.x]
@@ -43,7 +53,7 @@ class GenericKeyboard(object):
             self.y = 2
 
     def down(self):
-        if self.y < 1:
+        if self.y < 2:
             self.y = self.y + 1
         else:
             self.y = 0

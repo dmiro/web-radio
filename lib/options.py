@@ -10,7 +10,7 @@ class OptionsTree(object):
     # private
     #
 
-    DISPLAY = 0
+    MENU = 0
     KEYBOARD = 1
 
     @property
@@ -47,13 +47,13 @@ class OptionsTree(object):
         pass
 
     def get_menu_option(self, title, options):
-        return {'type': self.DISPLAY, 'title': title, 'options': options}
+        return {'type': self.MENU, 'title': title, 'options': options}
 
     def get_keyboard_option(self, title, options):
         return {'type': self.KEYBOARD, 'title': title, 'options': options}
 
-    def current_option_is_display(self):
-        return self.atop['type']  == self.DISPLAY
+    def current_option_is_menu(self):
+        return self.atop['type']  == self.MENU
 
     def current_option_is_keyboard(self):
         return self.atop['type'] == self.KEYBOARD
@@ -74,13 +74,34 @@ class OptionsTree(object):
         """back in the options tree"""
         if len(self.stack) > 1:
             self.stack.pop()
+            #"""
+            if self.current_option_is_keyboard():
+                self.back()
+            #"""
 
     def forward(self, index):
         """forward in the options tree"""
+
+        #"""
+        if self.current_option_is_keyboard():
+            options = self.atop['options'](index)
+            self.stack.append(options)
+            return
+        #"""
+
         if self.atop['options']:
             self.atop['selected'] = index
             selected = self.atop['options'][index]
+
+            #"""
+            if selected['type'] == self.KEYBOARD:
+                self.stack.append(selected)
+                return
+            #"""
+
             if callable(selected['options']):
-                selected['options'](selected['title'])
+                options = selected['options'](selected['title'])
+                if options:
+                    self.stack.append(options)
             else:
                 self.stack.append(selected)
