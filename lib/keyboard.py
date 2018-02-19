@@ -30,10 +30,6 @@ class GenericKeyboard(object):
     # private
     #
 
-    def __adjust_x(self):
-        if self.x >= self.__numchars -1:
-            self.x = self.__numchars - 1
-
     def __move_x(self, offset):
         self.x = self.x + offset
         num_chars = len(self.keyboard[self.y])
@@ -123,24 +119,19 @@ class GenericKeyboard(object):
 class ConsoleKeyboard(GenericKeyboard):
 
     #http://ascii-table.com/ansi-escape-sequences-vt-100.php
-    UP = '\33A'
-    DOWN = '\33B'
-    LEFT = '\33C'
-    RIGHT = '\33D'
     RED = '\033[31m'
     DEFCOLOR = '\033[0m'
-    MOVE_UP_FIVE_LINES = '\33[5A'
+    MOVE_UP_N_LINES = '\33[{0}A'
     CLEAR_ENTIRE_LINE = '\33[K'
 
     def display(self):
+        num_lines = len(self.keyboard)
         key = self.selected()
         shine = self.RED + key + self.DEFCOLOR
-        print self.MOVE_UP_FIVE_LINES
+        print self.MOVE_UP_N_LINES.format(num_lines + 2)
         print self.CLEAR_ENTIRE_LINE + self.title + ':' + self.text
-        print self.CLEAR_ENTIRE_LINE + ' '.join(self.keyboard[0]).replace(key, shine)
-        print self.CLEAR_ENTIRE_LINE + ' '.join(self.keyboard[1]).replace(key, shine)
-        print self.CLEAR_ENTIRE_LINE + ' '.join(self.keyboard[2]).replace(key, shine)
-
+        for index in range(num_lines):
+            print self.CLEAR_ENTIRE_LINE + ' '.join(self.keyboard[index]).replace(key, shine)
 
 #
 # main

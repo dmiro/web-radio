@@ -102,6 +102,8 @@ class GenericMenu(object):
 class ConsoleMenu(GenericMenu):
     
     #http://ascii-table.com/ansi-escape-sequences-vt-100.php
+    RED = '\033[31m'
+    DEFCOLOR = '\033[0m'
     NEW_LINE = '\33[20h'
     MOVE_UP_FIVE_LINES = '\33[5A'
     CLEAR_ENTIRE_LINE = '\33[K'
@@ -119,7 +121,7 @@ class ConsoleMenu(GenericMenu):
      
         for index, value in enumerate(self.display_options):            
             if index == self.display_selected:
-                print self.CLEAR_ENTIRE_LINE + '*' + value + '*'
+                print self.CLEAR_ENTIRE_LINE + self.RED + value + self.DEFCOLOR
             else:
                 print self.CLEAR_ENTIRE_LINE + value
 
