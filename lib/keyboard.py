@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import i18n
 
 #
@@ -11,64 +12,94 @@ class GenericKeyboard(object):
     CANCEL_MSG = '<CANCEL>'
     KEYPRESS_MSG = '<KEY>'
 
+
     #
     # constructor
     #
 
     def __init__(self, title='', text=''):
         object.__init__(self)
+        self.kid = 0
         self.text = text
         self.title = title
         self.x = 0
         self.y = 0
+        self.display()
+
+    #
+    # private
+    #
+
+    def __adjust_x(self):
+        if self.x >= self.__numchars -1:
+            self.x = self.__numchars - 1
+
+    def __move_x(self, offset):
+        self.x = self.x + offset
+        num_chars = len(self.keyboard[self.y])
+        if self.x < 0:
+            self.x = num_chars - 1
+        elif self.x > num_chars - 1:
+            self.x = 0
+
+    def __move_y(self, offset):
+        self.y = self.y + offset
+        num_lines = len(self.keyboard)
+        if self.y < 0:
+            self.y = num_lines - 1
+        elif self.y > num_lines - 1:
+            self.y = 0
+        self.__move_x(0)
 
     #
     # public
     #
 
+    @property
+    def keyboard(self):
+        return i18n.KEYBOARDS[self.kid]
+
     def enter(self):
         """return <end>, <cancel> or <key>"""
 
-        ENTER_KEY = '*'
-        CANCEL_KEY = 'R'
+        ENTER_KEY = u'▼'
+        CANCEL_KEY = u'◄'
         DEL_KEY = '<'
+        SWITCH_KEY = '^'
+        SPACE_KEY = u'═══'
 
-        if self.selected() == ENTER_KEY:
+        if self.selected() == SWITCH_KEY:
+            self.kid = self.kid + 1
+            if self.kid >= len(i18n.KEYBOARDS):
+                self.kid = 0
+            return
+        elif self.selected() == ENTER_KEY:
             return self.END_MSG
-        if self.selected() == CANCEL_KEY:
+        elif self.selected() == CANCEL_KEY:
             return self.CANCEL_MSG
-        if self.selected() == DEL_KEY:
+        elif self.selected() == DEL_KEY:
             self.text = self.text[:-1]
+        elif self.selected() == SPACE_KEY:
+            self.text = self.text + ' '
+            return self.KEYPRESS_MSG
         else:
             self.text = self.text + self.selected()
-        return self.KEYPRESS_MSG
+            return self.KEYPRESS_MSG
 
     def selected(self):
-        return i18n.KEYBOARD1[self.y][self.x]
+        return self.keyboard[self.y][self.x]
 
     def up(self):
-        if self.y > 0:
-            self.y = self.y - 1
-        else:
-            self.y = 2
+        self.__move_y(-1)
 
     def down(self):
-        if self.y < 2:
-            self.y = self.y + 1
-        else:
-            self.y = 0
+        self.__move_y(+1)
 
     def left(self):
-        if self.x > 0:
-            self.x = self.x - 1
-        else:
-            self.x = 9
+        self.__move_x(-1)
 
     def right(self):
-        if self.x < 9:
-            self.x = self.x + 1
-        else:
-            self.x = 0
+        self.__move_x(+1)
 
     #
     # to override
@@ -101,18 +132,14 @@ class ConsoleKeyboard(GenericKeyboard):
     MOVE_UP_FIVE_LINES = '\33[5A'
     CLEAR_ENTIRE_LINE = '\33[K'
 
-    def __init__(self, *args, **kwargs):
-        GenericKeyboard.__init__(self, *args, **kwargs)
-        self.display()
-
     def display(self):
         key = self.selected()
         shine = self.RED + key + self.DEFCOLOR
         print self.MOVE_UP_FIVE_LINES
         print self.CLEAR_ENTIRE_LINE + self.title + ':' + self.text
-        print self.CLEAR_ENTIRE_LINE + ' '.join(i18n.KEYBOARD1[0]).replace(key, shine)
-        print self.CLEAR_ENTIRE_LINE + ' '.join(i18n.KEYBOARD1[1]).replace(key, shine)
-        print self.CLEAR_ENTIRE_LINE + ' '.join(i18n.KEYBOARD1[2]).replace(key, shine)
+        print self.CLEAR_ENTIRE_LINE + ' '.join(self.keyboard[0]).replace(key, shine)
+        print self.CLEAR_ENTIRE_LINE + ' '.join(self.keyboard[1]).replace(key, shine)
+        print self.CLEAR_ENTIRE_LINE + ' '.join(self.keyboard[2]).replace(key, shine)
 
 
 #
