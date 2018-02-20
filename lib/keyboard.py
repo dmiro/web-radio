@@ -12,7 +12,6 @@ class GenericKeyboard(object):
     CANCEL_MSG = '<CANCEL>'
     KEYPRESS_MSG = '<KEY>'
 
-
     #
     # constructor
     #
@@ -30,22 +29,43 @@ class GenericKeyboard(object):
     # private
     #
 
+    def __resolve_x(self, x, y1, y2):
+
+        # calculate virtual keyboard
+
+        vkb = []
+        for line in self.keyboard:
+            virtual_keys = []
+            for index, key in enumerate(line):
+                num_virtual_keys = (len(key) / 2) + 1
+                virtual_keys = virtual_keys + [index] * num_virtual_keys
+            vkb.append(virtual_keys)
+
+        # get x from virtual keyboard
+
+        n = vkb[y1].index(x)
+        if n >= len(vkb[y2]):
+            return vkb[y2][-1]
+        else:
+            return vkb[y2][n]
+
     def __move_x(self, offset):
         self.x = self.x + offset
-        num_chars = len(self.keyboard[self.y])
+        num_chars = len(self.keyboard[self.y]) - 1
         if self.x < 0:
-            self.x = num_chars - 1
-        elif self.x > num_chars - 1:
+            self.x = num_chars
+        elif self.x > num_chars:
             self.x = 0
 
     def __move_y(self, offset):
+        old_y = self.y
         self.y = self.y + offset
-        num_lines = len(self.keyboard)
+        num_lines = len(self.keyboard) - 1
         if self.y < 0:
-            self.y = num_lines - 1
-        elif self.y > num_lines - 1:
+            self.y = num_lines
+        elif self.y > num_lines:
             self.y = 0
-        self.__move_x(0)
+        self.x = self.__resolve_x(self.x, old_y, self.y)
 
     #
     # public

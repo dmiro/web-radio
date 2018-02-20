@@ -17,6 +17,11 @@ LANGUAGES = 'languages'
 EMPTY = 'empty'
 SEARCH = 'search'
 
+PLAY = 'play'
+ADD_FAVORITES = 'add to favorites'
+MORE_INFO = 'more info'
+REMOVE_FAVORITES = 'remove from favorites'
+
 KEYBOARD0 = [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '<'],
              ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', u'▼', u'◄'],
              ['^', 'z', 'x', 'c', u'═══', 'v', 'b', 'n', 'm']]

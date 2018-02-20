@@ -15,13 +15,17 @@ class Options(OptionsTree):
 
     # helpers
 
-    def get_stations_menu(self, stations, options):
+    def get_stations_menu(self, stations):
+        station_menu = [self.get_menu_option(i18n.PLAY, self.final),
+                        self.get_menu_option(i18n.ADD_FAVORITES, self.final),
+                        self.get_menu_option(i18n.MORE_INFO, self.final),
+                        self.get_menu_option(i18n.REMOVE_FAVORITES, self.final)] # todo: remove if station is not favorites
         result = []
         for station in stations:
             if station[2] != 0:
-                result.append(self.get_menu_option(station[0] + '|' + str(station[2]) + 'kbps', options))
+                result.append(self.get_menu_option(station[0] + '|' + str(station[2]) + 'kbps', station_menu))
             else:
-                result.append(self.get_menu_option(station[0], options))
+                result.append(self.get_menu_option(station[0], station_menu))
         return result
 
     def get_list_menu(self, items, options):
@@ -33,7 +37,7 @@ class Options(OptionsTree):
     def stations_by_tag(self, title):
         tag = title[:title.rfind(" (")]
         stations = get_stations_by_tag(tag)
-        menu = self.get_stations_menu(stations, self.final)
+        menu = self.get_stations_menu(stations)
         return self.get_menu_option(tag, menu)
 
     def tags(self, title):
@@ -46,7 +50,7 @@ class Options(OptionsTree):
     def stations_by_country(self, title):
         country = title[:title.rfind(" (")]
         stations = get_stations_by_country(country)
-        menu = self.get_stations_menu(stations, self.final)
+        menu = self.get_stations_menu(stations)
         return self.get_menu_option(country, menu)
 
     def countries(self, title):
@@ -59,7 +63,7 @@ class Options(OptionsTree):
     def stations_by_language(self, title):
         language = title[:title.rfind(" (")]
         stations = get_stations_by_language(language)
-        menu = self.get_stations_menu(stations, self.final)
+        menu = self.get_stations_menu(stations)
         return self.get_menu_option(language, menu)
 
     def languages(self, title):
@@ -71,7 +75,7 @@ class Options(OptionsTree):
 
     def search(self, title):
         stations = get_stations_by_text(title)
-        menu = self.get_stations_menu(stations, self.final)
+        menu = self.get_stations_menu(stations)
         return self.get_menu_option(title, menu)
 
     #
