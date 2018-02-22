@@ -4,7 +4,8 @@ import subprocess
 import gzip
 import os
 from datetime import datetime, timedelta
-
+from execute import execute
+from shutil import copy2
 
 """
 create database from repository radio-browser.info in sqlite format
@@ -32,48 +33,63 @@ def create_db():
 
     print '--init--'
 
-    # creating database backup
+    try:
 
-    if os.path.exists(DATABASE_FILE):
-        print 'creating database backup'
-        os.rename(DATABASE_FILE, DATABASE_BAK_FILE)
+        # creating database backup
 
-    # download radio-browser database
+        if os.path.exists(DATABASE_FILE):
+            print 'creating database backup'
+            os.rename(DATABASE_FILE, DATABASE_BAK_FILE)
 
-    print 'download radio-browser database'
-    subprocess.call(['curl', 'http://www.radio-browser.info/backups/latest.sql.gz', '--output', os.path.realpath(LATEST_GZ_FILE)])
+        # download radio-browser database
 
-    # decompress database
+        print 'download radio-browser database'
+        execute(['curl', 'http://www.radio-browser.info/backups/latest.sql.gz', '--output', os.path.realpath(LATEST_GZ_FILE)], timeout=40)
 
-    print 'decompress database'
-    inF = gzip.open(LATEST_GZ_FILE, 'rb')
-    outF = open(LATEST_FILE, 'wb')
-    outF.write( inF.read() )
-    inF.close()
-    outF.close()
+        # decompress database
 
-    # convert dump from mysql to sqlite
+        print 'decompress database'
+        inF = gzip.open(LATEST_GZ_FILE, 'rb')
+        outF = open(LATEST_FILE, 'wb')
+        outF.write(inF.read())
+        inF.close()
+        outF.close()
 
-    print 'convert dump from mysql to sqlite'
-    process = subprocess.Popen([os.path.realpath('./lib/mysql2sqlite'), os.path.realpath(LATEST_FILE)], stdout=subprocess.PIPE)
-    out, err = process.communicate()
-    outF = open(LATEST_SQLITE_FILE, 'wb')
-    outF.write( out )
-    outF.close()
+        # convert dump from mysql to sqlite
 
-    # create and populate database
+        print 'convert dump from mysql to sqlite'
+        process = subprocess.Popen([os.path.realpath('./lib/mysql2sqlite'), os.path.realpath(LATEST_FILE)], stdout=subprocess.PIPE)
+        out, err = process.communicate()
+        outF = open(LATEST_SQLITE_FILE, 'wb')
+        outF.write(out)
+        outF.close()
 
-    print 'create and populate database'
-    myinput = open(LATEST_SQLITE_FILE)
-    p = subprocess.Popen(['sqlite3', DATABASE_FILE], stdin=myinput)
-    p.wait()
+        # create and populate database
 
-    # remove files
+        print 'create and populate database'
+        myinput = open(LATEST_SQLITE_FILE)
+        p = subprocess.Popen(['sqlite3', DATABASE_FILE], stdin=myinput)
+        p.wait()
 
-    print 'removing files'
-    if os.path.exists(LATEST_GZ_FILE): os.remove(LATEST_GZ_FILE)
-    if os.path.exists(LATEST_FILE): os.remove(LATEST_FILE)
-    if os.path.exists(LATEST_SQLITE_FILE): os.remove(LATEST_SQLITE_FILE)
+    except Exception as ex:
+
+        # recovering database backup
+
+        print "exception!", ex
+        if os.path.exists(DATABASE_BAK_FILE):
+            print 'recovering database backup'
+            copy2(DATABASE_BAK_FILE, DATABASE_FILE) # copy2 preserve original metadata
+        else:
+            print 'there is no database backup to recover'
+
+    finally:
+
+        # remove files
+
+        print 'removing files'
+        if os.path.exists(LATEST_GZ_FILE): os.remove(LATEST_GZ_FILE)
+        if os.path.exists(LATEST_FILE): os.remove(LATEST_FILE)
+        if os.path.exists(LATEST_SQLITE_FILE): os.remove(LATEST_SQLITE_FILE)
 
     # end
 
@@ -87,7 +103,8 @@ def check_db():
         timefile = datetime.fromtimestamp(os.path.getmtime(DATABASE_FILE))
         yesterday = datetime.today() - timedelta(days=1)
         if timefile < yesterday:
-	    create_db()
+            create_db()
+
     # import database because does not exist
     else:
         create_db()
