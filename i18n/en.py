@@ -8,7 +8,6 @@ FM = 'FM Radio'
 BLUETOOTH = 'Bluetooth'
 OPTIONS = 'Options'
 
-RADIO = 'radio'
 FAVORITES = 'favorites'
 RECENT = 'recent'
 TAGS = 'tags'
