@@ -57,4 +57,6 @@ def get_stations_by_language(language):
 def get_stations_by_text(text):
     return query("select Name, Url, Bitrate from Station where lower(Name) like '%{0}%';".format(text.lower()), PATH_RADIO_DB)
 
-
+def get_station_by_url(url):
+    result = query("select Name, Url, Bitrate from Station where Url = '{0}';".format(url), PATH_RADIO_DB)
+    return result[0] if len(result) > 0 else None

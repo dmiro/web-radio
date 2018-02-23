@@ -1,27 +1,25 @@
 # MAIN
 
-from lib.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, get_stations_by_language, get_stations_by_text
-from lib.createdb import check_db
-from lib.options import OptionsTree
 import i18n
 
+from lib.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, \
+    get_stations_by_language, get_stations_by_text, get_station_by_url
+from lib.createdb import check_db
 from lib.keypad import FisicKeyboard
 from lib.menu import ConsoleMenu
 from lib.keyboard import ConsoleKeyboard
 from lib.application import Application
+from lib.config import config
 
 
-class Options(OptionsTree):
+class WebRadioApp(Application):
 
     # helpers
 
     def get_stations_menu(self, stations):
-        station_menu = [self.get_menu_option(i18n.PLAY, self.final),
-                        self.get_menu_option(i18n.ADD_FAVORITES, self.final),
-                        self.get_menu_option(i18n.MORE_INFO, self.final),
-                        self.get_menu_option(i18n.REMOVE_FAVORITES, self.final)] # todo: remove if station is not favorites
         result = []
         for station in stations:
+            station_menu = self.get_station_menu(station[1])
             if station[2] != 0:
                 result.append(self.get_menu_option(station[0] + '|' + str(station[2]) + 'kbps', station_menu))
             else:
@@ -31,6 +29,35 @@ class Options(OptionsTree):
     def get_list_menu(self, items, options):
         result = [self.get_menu_option(item[0] + ' (' + str(item[1]) + ')', options) for item in items]
         return result
+
+    # station
+
+    def play(self, url):
+        def play_(self):
+            pass
+        return play_
+
+    def add_favorite(self, url):
+        def add_(self):
+            if url not in config.favorites:
+                config.favorites = config.favorites + [url]
+        return add_
+
+    def remove_favorite(self, url):
+        def del_(self):
+            if url in config.favorites:
+                config.favorites.remove(url)
+        return del_
+
+    def get_station_menu(self, url):
+        station_is_favorite = url in config.favorites
+        menu = [self.get_menu_option(i18n.PLAY, self.play(url))]
+        if not station_is_favorite:
+            menu.append(self.get_menu_option(i18n.ADD_FAVORITES, self.add_favorite(url)))
+        menu.append(self.get_menu_option(i18n.MORE_INFO, self.final))
+        if station_is_favorite:
+            menu.append(self.get_menu_option(i18n.REMOVE_FAVORITES, self.remove_favorite(url)))
+        return menu
 
     # stations by tag
 
@@ -78,16 +105,38 @@ class Options(OptionsTree):
         menu = self.get_stations_menu(stations)
         return self.get_menu_option(title, menu)
 
+    # favorites
+
+    def favorites(self, title):
+        stations = []
+        for favorite in config.favorites:
+            station = get_station_by_url(favorite)
+            if station:
+                stations.append(station)
+        menu = self.get_stations_menu(stations)
+        return self.get_menu_option(title, menu)
+
+    # recent
+
+    def recent(self, title):
+        stations = []
+        for recent in config.recents:
+            station = get_station_by_url(recent)
+            if station:
+                stations.append(station)
+        menu = self.get_stations_menu(stations)
+        return self.get_menu_option(title, menu)
+
     #
     # constructor
     #
     
-    def __init__(self):
-        OptionsTree.__init__(self)
+    def __init__(self, *args, **kargs):
+        super(WebRadioApp, self).__init__(*args, **kargs)
         empty = []
         radio = [
-            self.get_menu_option(i18n.FAVORITES, empty),
-            self.get_menu_option(i18n.RECENT, empty),
+            self.get_menu_option(i18n.FAVORITES, self.favorites),
+            self.get_menu_option(i18n.RECENT, self.recent),
             self.get_keyboard_option(i18n.SEARCH, self.search),
             self.get_menu_option(i18n.TAGS, self.tags),
             self.get_menu_option(i18n.COUNTRIES, self.countries),
@@ -107,8 +156,7 @@ class Options(OptionsTree):
 #
 
 check_db()
-app = Application(ConsoleMenu(),
+app = WebRadioApp(ConsoleMenu(),
                   ConsoleKeyboard(),
-                  FisicKeyboard(),
-                  Options())
+                  FisicKeyboard())
 app.start()
