@@ -34,6 +34,12 @@ class WebRadioApp(Application):
 
     def play(self, url):
         def play_(self):
+            # add to recents
+            if url not in config.recents:
+                config.recents.insert(0, url)
+                maxrecent = config.maxrecents if config.maxrecents > 0 else 1
+                config.recents = config.recents[:maxrecent]
+            # play
             pass
         return play_
 
@@ -49,12 +55,17 @@ class WebRadioApp(Application):
                 config.favorites.remove(url)
         return del_
 
+    def more(self, url):
+        def more_(self):
+            pass
+        return more_
+
     def get_station_menu(self, url):
         station_is_favorite = url in config.favorites
         menu = [self.get_menu_option(i18n.PLAY, self.play(url))]
         if not station_is_favorite:
             menu.append(self.get_menu_option(i18n.ADD_FAVORITES, self.add_favorite(url)))
-        menu.append(self.get_menu_option(i18n.MORE_INFO, self.final))
+        menu.append(self.get_menu_option(i18n.MORE_INFO, self.more))
         if station_is_favorite:
             menu.append(self.get_menu_option(i18n.REMOVE_FAVORITES, self.remove_favorite(url)))
         return menu

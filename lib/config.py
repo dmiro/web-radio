@@ -11,5 +11,6 @@ class Config(IniConfig):
                                                                  'http://streams.90s90s.de/main/mp3-192/streams.90s90s.de/'])
     recents = IniConfig.iniproperty('web-radio', 'recents', ['http://streaming3.radiocat.net:80/',
                                                             'http://streams.90s90s.de/main/mp3-192/streams.90s90s.de/'])
+    maxrecents = IniConfig.iniproperty('web-radio', 'maxrecents', 25)
 
 config = Config(CONFIG_FILE)
