@@ -1,15 +1,15 @@
 # MAIN
 
-import i18n
+from lib.database.createdb import check_db
 
-from lib.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, \
-    get_stations_by_language, get_stations_by_text, get_station_by_url
-from lib.createdb import check_db
-from lib.keypad import FisicKeyboard
-from lib.menu import ConsoleMenu
-from lib.keyboard import ConsoleKeyboard
+import i18n
 from lib.application import Application
 from lib.config import config
+from lib.database.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, \
+    get_stations_by_language, get_stations_by_text, get_station_by_url
+from lib.widgets.keyboard import ConsoleKeyboard
+from lib.widgets.keypad import FisicKeyboard
+from lib.widgets.menu import ConsoleMenu
 
 
 class WebRadioApp(Application):
@@ -138,6 +138,18 @@ class WebRadioApp(Application):
         menu = self.get_stations_menu(stations)
         return self.get_menu_option(title, menu)
 
+    # wifi
+
+    def actual_wifi_ssid(self):
+        return i18n.SSID + ':' + config.wifi_ssid
+
+    def actual_wifi_password(self):
+        return i18n.PASSWORD + ':' + config.wifi_password
+
+    def wifi_password(self, title):
+        config.wifi_password = title
+
+
     #
     # constructor
     #
@@ -153,11 +165,21 @@ class WebRadioApp(Application):
             self.get_menu_option(i18n.COUNTRIES, self.countries),
             self.get_menu_option(i18n.LANGUAGES, self.languages)
             ]
+        wifi = [
+            self.get_menu_option(self.actual_wifi_ssid, empty),
+            self.get_keyboard_option(self.actual_wifi_password, self.wifi_password),
+            self.get_menu_option(i18n.CHECK, empty),
+            self.get_menu_option(i18n.REMOVE, empty)
+        ]
+        options = [
+            self.get_menu_option(i18n.WIFI, wifi),
+            self.get_menu_option(i18n.UPDATE, wifi)
+        ]
         main = [
             self.get_menu_option(i18n.RADIO, radio),
             self.get_menu_option(i18n.FM, empty),
             self.get_menu_option(i18n.BLUETOOTH, empty),
-            self.get_menu_option(i18n.OPTIONS, empty)
+            self.get_menu_option(i18n.OPTIONS, options)
             ]
         menu = self.get_menu_option(i18n.MENU, main)
         self.set_menu(menu)

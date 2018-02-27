@@ -34,3 +34,16 @@ KEYBOARD2 = [['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '<'],
              ['^', '*', '"', "'", u'═══', ':', ';', '!', '?']]
 
 KEYBOARDS = [KEYBOARD0, KEYBOARD1, KEYBOARD2]
+
+WIFI = 'wifi'
+SSID = 'ssid'
+PASSWORD = 'contraseña'
+REMOVE = 'olvidar'
+CHECK = 'comprobar'
+UPDATE = 'actualizar'
+
+STATION = u'estación'
+TITLE = u'título'
+TIME = 'tiempo'
+AUDIO = 'audio'
+BITRATE = 'bitrate'

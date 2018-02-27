@@ -23,6 +23,12 @@ class OptionsTree(object):
         index = len(self.stack) - 1
         self.stack[index] = value
 
+    def __get_title(self, title):
+        if callable(title):
+            return title()
+        else:
+            return title
+
     #
     # constructor
     #
@@ -59,10 +65,10 @@ class OptionsTree(object):
         return self.atop['type'] == self.KEYBOARD
 
     def current_menu_title(self):
-        return self.atop['title']
+        return self.__get_title(self.atop['title'])
 
     def current_menu_options(self):
-        return [op['title'] for op in self.atop['options']]
+        return [self.__get_title(op['title']) for op in self.atop['options']]
 
     def current_menu_selected(self):
         if 'selected' in self.atop:
@@ -85,7 +91,12 @@ class OptionsTree(object):
         #"""
         if self.current_option_is_keyboard():
             options = self.atop['options'](index)
-            self.stack.append(options)
+            #""" refine
+            if options:
+                self.stack.append(options)
+            else:
+                self.back()
+            #"""
             return
         #"""
 
@@ -100,7 +111,7 @@ class OptionsTree(object):
             #"""
 
             if callable(selected['options']):
-                options = selected['options'](selected['title'])
+                options = selected['options'](self.__get_title(selected['title']))
                 if options:
                     self.stack.append(options)
             else:

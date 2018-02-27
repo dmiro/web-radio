@@ -1,1 +1,2 @@
 iniconfig.py==1.0.3
+python-mpd2>=1.0.0
