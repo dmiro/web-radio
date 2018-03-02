@@ -1,8 +1,7 @@
-# MAIN
+import i18n
+import sys
 
 from lib.database.createdb import check_db
-
-import i18n
 from lib.application import Application
 from lib.config import config
 from lib.database.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, \
@@ -10,6 +9,7 @@ from lib.database.db import get_tags, get_stations_by_tag, get_countries, get_st
 from lib.widgets.keyboard import ConsoleKeyboard
 from lib.widgets.keypad import FisicKeyboard
 from lib.widgets.menu import ConsoleMenu
+from lib.helpers.mpdclient import MPDWrapper
 
 
 class WebRadioApp(Application):
@@ -183,6 +183,16 @@ class WebRadioApp(Application):
             ]
         menu = self.get_menu_option(i18n.MENU, main)
         self.set_menu(menu)
+
+        mpd_client = MPDWrapper()
+        connect = mpd_client.connect(config.mpd_host, config.mpd_port, config.mpd_timeout)
+        if connect:
+            print('connected to MPD')
+        else:
+            print('fail to connect MPD server.')
+            sys.exit(1)
+
+        mpd_client.test()
 
 #
 # main
