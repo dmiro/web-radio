@@ -9,7 +9,7 @@ from lib.database.db import get_tags, get_stations_by_tag, get_countries, get_st
 from lib.widgets.keyboard import ConsoleKeyboard
 from lib.widgets.keypad import FisicKeyboard
 from lib.widgets.menu import ConsoleMenu
-from lib.helpers.mpdclient import MPDWrapper
+from lib.helpers.mpdclient import mpd_client
 
 
 class WebRadioApp(Application):
@@ -32,15 +32,15 @@ class WebRadioApp(Application):
 
     # station
 
-    def play(self, url):
+    def play(self, uri):
         def play_(self):
             # add to recents
-            if url not in config.recents:
-                config.recents.insert(0, url)
-                maxrecent = config.maxrecents if config.maxrecents > 0 else 1
-                config.recents = config.recents[:maxrecent]
+            if uri not in config.recents:
+                config.recents.insert(0, uri)
+                maxrecents = config.maxrecents if config.maxrecents > 0 else 1
+                config.recents = config.recents[:maxrecents]
             # play
-            pass
+            mpd_client.play(uri)
         return play_
 
     def add_favorite(self, url):
@@ -60,14 +60,14 @@ class WebRadioApp(Application):
             pass
         return more_
 
-    def get_station_menu(self, url):
-        station_is_favorite = url in config.favorites
-        menu = [self.get_menu_option(i18n.PLAY, self.play(url))]
+    def get_station_menu(self, uri):
+        station_is_favorite = uri in config.favorites
+        menu = [self.get_menu_option(i18n.PLAY, self.play(uri))]
         if not station_is_favorite:
-            menu.append(self.get_menu_option(i18n.ADD_FAVORITES, self.add_favorite(url)))
+            menu.append(self.get_menu_option(i18n.ADD_FAVORITES, self.add_favorite(uri)))
         menu.append(self.get_menu_option(i18n.MORE_INFO, self.more))
         if station_is_favorite:
-            menu.append(self.get_menu_option(i18n.REMOVE_FAVORITES, self.remove_favorite(url)))
+            menu.append(self.get_menu_option(i18n.REMOVE_FAVORITES, self.remove_favorite(uri)))
         return menu
 
     # stations by tag
@@ -156,6 +156,9 @@ class WebRadioApp(Application):
     
     def __init__(self, *args, **kargs):
         super(WebRadioApp, self).__init__(*args, **kargs)
+
+        # create menu app
+
         empty = []
         radio = [
             self.get_menu_option(i18n.FAVORITES, self.favorites),
@@ -184,15 +187,14 @@ class WebRadioApp(Application):
         menu = self.get_menu_option(i18n.MENU, main)
         self.set_menu(menu)
 
-        mpd_client = MPDWrapper()
+        # connect to MPD
+
         connect = mpd_client.connect(config.mpd_host, config.mpd_port, config.mpd_timeout)
         if connect:
             print('connected to MPD')
         else:
             print('fail to connect MPD server.')
             sys.exit(1)
-
-        mpd_client.test()
 
 #
 # main

@@ -23,7 +23,6 @@ class GenericKeyboard(object):
         self.title = title
         self.x = 0
         self.y = 0
-        self.display()
 
     #
     # private
