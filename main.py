@@ -5,7 +5,7 @@ from lib.database.createdb import check_db
 from lib.application import Application
 from lib.config import config
 from lib.database.db import get_tags, get_stations_by_tag, get_countries, get_stations_by_country, get_languages, \
-    get_stations_by_language, get_stations_by_text, get_station_by_url
+    get_stations_by_language, get_stations_by_text, get_station_by_url, get_extended_station_by_url
 from lib.widgets.keyboard import ConsoleKeyboard
 from lib.widgets.keypad import FisicKeyboard
 from lib.widgets.menu import ConsoleMenu
@@ -43,21 +43,35 @@ class WebRadioApp(Application):
             mpd_client.play(uri)
         return play_
 
-    def add_favorite(self, url):
+    def add_favorite(self, uri):
         def add_(self):
-            if url not in config.favorites:
-                config.favorites = config.favorites + [url]
+            if uri not in config.favorites:
+                config.favorites = config.favorites + [uri]
         return add_
 
-    def remove_favorite(self, url):
+    def remove_favorite(self, uri):
         def del_(self):
-            if url in config.favorites:
-                config.favorites.remove(url)
+            if uri in config.favorites:
+                config.favorites.remove(uri)
         return del_
 
-    def more(self, url):
+    def more(self, uri):
+        self_ = self
         def more_(self):
-            pass
+            extended_info = get_extended_station_by_url(uri)
+            if extended_info:
+                menu = [
+                    self_.get_info_option(i18n.URL + ': ' + unicode(extended_info[1])),
+                    self_.get_info_option(i18n.COUNTRY + ': ' + unicode(extended_info[2])),
+                    self_.get_info_option(i18n.SUBCOUNTRY + ': ' + unicode(extended_info[3])),
+                    self_.get_info_option(i18n.LANGUAGE + ': ' + unicode(extended_info[4])),
+                    self_.get_info_option(i18n.TAGS + ': ' + unicode(extended_info[5])),
+                    self_.get_info_option(i18n.BITRATE + ': ' + unicode(extended_info[6])),
+                    self_.get_info_option(i18n.HOMEPAGE + ': ' + unicode(extended_info[7]))
+                ]
+                return self_.get_menu_option(extended_info[0], menu)
+            else:
+                return self_.get_menu_option(i18n.EMPTY, [])
         return more_
 
     def get_station_menu(self, uri):
@@ -65,7 +79,7 @@ class WebRadioApp(Application):
         menu = [self.get_menu_option(i18n.PLAY, self.play(uri))]
         if not station_is_favorite:
             menu.append(self.get_menu_option(i18n.ADD_FAVORITES, self.add_favorite(uri)))
-        menu.append(self.get_menu_option(i18n.MORE_INFO, self.more))
+        menu.append(self.get_menu_option(i18n.MORE_INFO, self.more(uri)))
         if station_is_favorite:
             menu.append(self.get_menu_option(i18n.REMOVE_FAVORITES, self.remove_favorite(uri)))
         return menu

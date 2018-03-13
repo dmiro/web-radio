@@ -12,6 +12,7 @@ class OptionsTree(object):
 
     MENU = 0
     KEYBOARD = 1
+    INFO = 2
 
     @property
     def atop(self):
@@ -58,11 +59,17 @@ class OptionsTree(object):
     def get_keyboard_option(self, title, options):
         return {'type': self.KEYBOARD, 'title': title, 'options': options}
 
+    def get_info_option(self, title):
+        return {'type': self.INFO, 'title': title, 'options': []}
+
     def current_option_is_menu(self):
-        return self.atop['type']  == self.MENU
+        return self.atop['type'] == self.MENU
 
     def current_option_is_keyboard(self):
         return self.atop['type'] == self.KEYBOARD
+
+    def current_option_is_info(self):
+        return self.atop['type'] == self.INFO
 
     def current_menu_title(self):
         return self.__get_title(self.atop['title'])
@@ -100,6 +107,9 @@ class OptionsTree(object):
             return
         #"""
 
+        if self.current_option_is_info():
+            return
+
         if self.atop['options']:
             self.atop['selected'] = index
             selected = self.atop['options'][index]
@@ -109,6 +119,9 @@ class OptionsTree(object):
                 self.stack.append(selected)
                 return
             #"""
+
+            if selected['type'] == self.INFO:
+                return
 
             if callable(selected['options']):
                 options = selected['options'](self.__get_title(selected['title']))
@@ -225,12 +238,16 @@ class Application(OptionsTree):
             return self.handle_menu(key)
         elif self.current_option_is_keyboard():
             return self.handle_keyboard(key)
+        elif self.current_option_is_info():
+            return self.handle_menu(key)
 
     def refresh(self):
         if self.current_option_is_menu():
             self.refresh_menu()
         elif self.current_option_is_keyboard():
             self.refresh_keyboard()
+        elif self.current_option_is_info():
+            self.refresh_menu()
 
     #
     # public

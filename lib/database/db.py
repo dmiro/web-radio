@@ -58,3 +58,11 @@ def get_stations_by_text(text):
 def get_station_by_url(url):
     result = query("select Name, Url, Bitrate from Station where Url = '{0}';".format(url), PATH_RADIO_DB)
     return result[0] if len(result) > 0 else None
+
+def get_extended_station_by_url(url):
+    result = query("select Name, Url, Country, Subcountry, Language, Tags, Bitrate, Homepage from Station where Url = '{0}';".format(url), PATH_RADIO_DB)
+    return result[0] if len(result) > 0 else None
+
+
+
+

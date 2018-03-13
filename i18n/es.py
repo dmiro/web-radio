@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 # spanish literals
 
-MENU = 'Menu'
+MENU = u'Menu'
 
-RADIO = 'Web Radio'
-FM = 'FM Radio'
-BLUETOOTH = 'Bluetooth'
-OPTIONS = 'Opciones'
+RADIO = u'Web Radio'
+FM = u'FM Radio'
+BLUETOOTH = u'Bluetooth'
+OPTIONS = u'Opciones'
 
-FAVORITES = 'favoritos'
-RECENT = 'reciente'
-TAGS = 'etiquetas'
-COUNTRIES = 'paises'
-LANGUAGES = 'idiomas'
-EMPTY = 'vacio'
-SEARCH = 'buscar'
+FAVORITES = u'favoritos'
+RECENT = u'reciente'
+TAGS = u'etiquetas'
+COUNTRIES = u'paises'
+LANGUAGES = u'idiomas'
+EMPTY = u'vacio'
+SEARCH = u'buscar'
 
-PLAY = 'reproducir'
+PLAY = u'reproducir'
 ADD_FAVORITES = u'añadir a favoritos'
 MORE_INFO = u'mas información'
-REMOVE_FAVORITES = 'quitar de favoritos'
+REMOVE_FAVORITES = u'quitar de favoritos'
 
 KEYBOARD0 = [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '<'],
              ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', u'▼', u'◄'],
@@ -35,15 +35,22 @@ KEYBOARD2 = [['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '<'],
 
 KEYBOARDS = [KEYBOARD0, KEYBOARD1, KEYBOARD2]
 
-WIFI = 'wifi'
-SSID = 'ssid'
-PASSWORD = 'contraseña'
-REMOVE = 'olvidar'
-CHECK = 'comprobar'
-UPDATE = 'actualizar'
+WIFI = u'wifi'
+SSID = u'ssid'
+PASSWORD = u'contraseña'
+REMOVE = u'olvidar'
+CHECK = u'comprobar'
+UPDATE = u'actualizar'
 
 STATION = u'estación'
 TITLE = u'título'
-TIME = 'tiempo'
-AUDIO = 'audio'
-BITRATE = 'bitrate'
+TIME = u'tiempo'
+AUDIO = u'audio'
+BITRATE = u'bitrate'
+
+NAME = u'nombre'
+COUNTRY = u'país'
+SUBCOUNTRY = u'subpais'
+HOMEPAGE = u'página web'
+URL = u'url'
+LANGUAGE = u'idiomas'
